@@ -1,7 +1,9 @@
 package com.briup.apps.cms.web.controller;
 
+import com.briup.apps.cms.bean.BaseUser;
 import com.briup.apps.cms.bean.extend.BaseUserExtend;
 import com.briup.apps.cms.service.IBaseUserService;
+import com.briup.apps.cms.utils.JwtTokenUtil;
 import com.briup.apps.cms.utils.Message;
 import com.briup.apps.cms.utils.MessageUtil;
 import com.briup.apps.cms.vm.UserVM;
@@ -31,10 +33,12 @@ public class UserController {
     @PostMapping(value = "login")
     public Message login(@RequestBody UserVM userVM){
         //1.验证用户身份
-        //2.产生一个token，缓存起来
-        //3.返回
+        BaseUser user = baseUserService.login(userVM);
+        //2.如果登录成功，产生一个token，缓存起来,返回
+        String token = JwtTokenUtil.createJWT(user.getId(),user.getUsername());
+        //3.如果登录失败
         Map<String,String > map = new HashMap<>();
-        map.put("token","admin-token");
+        map.put("token",token);
         return MessageUtil.success(map);
     }
 
@@ -43,16 +47,17 @@ public class UserController {
     public Message login(){
         //1.将缓存中的token移除
         //2.其他
-        return MessageUtil.success("success");
+        return MessageUtil.success("退出成功");
     }
 
-    @ApiOperation(value = "通过token获取用户信息")
+    @ApiOperation(value = "通过token获取用户的基本信息")
     @GetMapping(value = "info")
     public Message info(String token){
-        //1.通过token获取用户信息
+        // 1. 通过token获取用户信息  {id,use,gender,roles:[]}
+        Long id = Long.parseLong(JwtTokenUtil.getUserId(token,JwtTokenUtil.base64Secret));
+        BaseUserExtend baseUserExtend = baseUserService.findById(id);
 
-        BaseUserExtend user = baseUserService.findById(1l);
-        return MessageUtil.success(user);
+        return MessageUtil.success(baseUserExtend);
 
     }
 

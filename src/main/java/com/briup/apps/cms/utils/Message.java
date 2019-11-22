@@ -1,10 +1,10 @@
 package com.briup.apps.cms.utils;
 
 public class Message {
-    private Integer status;
-    private String message;
-    private Object data;
-    private Long timestamp;
+    private Integer status; //状态码 200 500
+    private String message; //信息
+    private Object data;    //操作结果，查询结构
+    private Long timestamp; //时间戳
 
     public Integer getStatus() {
         return status;
